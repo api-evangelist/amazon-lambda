@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api-evangelist.com/schemas/amazon/lambda/function.json",
+  "title": "Amazon Lambda Function",
+  "description": "Represents an AWS Lambda function configuration with its associated runtime settings, resource allocation, and metadata.",
+  "type": "object",
+  "required": ["functionName", "functionArn", "role", "runtime"],
+  "properties": {
+    "functionName": {
+      "type": "string",
+      "description": "The name of the Lambda function",
+      "minLength": 1,
+      "maxLength": 140,
+      "pattern": "^[a-zA-Z0-9-_]+$"
+    },
+    "functionArn": {
+      "type": "string",
+      "description": "The function's Amazon Resource Name (ARN)",
+      "pattern": "^arn:aws:lambda:[a-z]{2}(-gov)?-[a-z]+-\\d{1}:\\d{12}:function:[a-zA-Z0-9-_]+(:(\\$LATEST|[a-zA-Z0-9-_]+))?$"
+    },
+    "runtime": {
+      "type": "string",
+      "description": "The runtime environment for the Lambda function",
+      "enum": [
+        "nodejs18.x",
+        "nodejs20.x",
+        "nodejs22.x",
+        "python3.9",
+        "python3.10",
+        "python3.11",
+        "python3.12",
+        "python3.13",
+        "java11",
+        "java17",
+        "java21",
+        "dotnet6",
+        "dotnet8",
+        "ruby3.2",
+        "ruby3.3",
+        "provided.al2",
+        "provided.al2023"
+      ]
+    },
+    "handler": {
+      "type": "string",
+      "description": "The function within your code that Lambda calls to begin execution",
+      "maxLength": 128,
+      "pattern": "^[^\\s]+$"
+    },
+    "role": {
+      "type": "string",
+      "description": "The ARN of the IAM execution role that Lambda assumes when it runs the function",
+      "pattern": "^arn:aws:iam::\\d{12}:role/.+$"
+    },
+    "codeSize": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The size of the function's deployment package in bytes"
+    },
+    "codeSha256": {
+      "type": "string",
+      "description": "The SHA256 hash of the function's deployment package"
+    },
+    "description": {
+      "type": "string",
+      "description": "The function's description",
+      "maxLength": 256
+    },
+    "timeout": {
+      "type": "integer",
+      "description": "The amount of time in seconds that Lambda allows a function to run before stopping it",
+      "minimum": 1,
+      "maximum": 900,
+      "default": 3
+    },
+    "memorySize": {
+      "type": "integer",
+      "description": "The amount of memory available to the function at runtime in MB",
+      "minimum": 128,
+      "maximum": 10240,
+      "default": 128
+    },
+    "lastModified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time that the function was last updated in ISO-8601 format"
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Lambda function"
+    },
+    "state": {
+      "$ref": "#/$defs/FunctionState"
+    },
+    "stateReason": {
+      "type": "string",
+      "description": "The reason for the function's current state"
+    },
+    "stateReasonCode": {
+      "type": "string",
+      "description": "The reason code for the function's current state",
+      "enum": [
+        "Idle",
+        "Creating",
+        "Restoring",
+        "EniLimitExceeded",
+        "InsufficientRolePermissions",
+        "InvalidConfiguration",
+        "InternalError",
+        "SubnetOutOfIPAddresses",
+        "InvalidSubnet",
+        "InvalidSecurityGroup",
+        "ImageDeleted",
+        "ImageAccessDenied",
+        "InvalidImage"
+      ]
+    },
+    "packageType": {
+      "type": "string",
+      "description": "The type of deployment package",
+      "enum": ["Zip", "Image"]
+    },
+    "architectures": {
+      "type": "array",
+      "description": "The instruction set architecture that the function supports",
+      "items": {
+        "type": "string",
+        "enum": ["x86_64", "arm64"]
+      },
+      "maxItems": 1
+    },
+    "environment": {
+      "$ref": "#/$defs/Environment"
+    },
+    "vpcConfig": {
+      "$ref": "#/$defs/VpcConfig"
+    },
+    "layers": {
+      "type": "array",
+      "description": "The function's layers",
+      "items": {
+        "$ref": "#/$defs/Layer"
+      },
+      "maxItems": 5
+    },
+    "ephemeralStorage": {
+      "$ref": "#/$defs/EphemeralStorage"
+    },
+    "tracingConfig": {
+      "$ref": "#/$defs/TracingConfig"
+    },
+    "tags": {
+      "type": "object",
+      "description": "The function's tags as key-value pairs",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "revisionId": {
+      "type": "string",
+      "description": "The latest updated revision of the function or alias"
+    }
+  },
+  "$defs": {
+    "FunctionState": {
+      "type": "string",
+      "description": "The current state of the Lambda function",
+      "enum": ["Pending", "Active", "Inactive", "Failed"]
+    },
+    "Environment": {
+      "type": "object",
+      "description": "A function's environment variable settings",
+      "properties": {
+        "variables": {
+          "type": "object",
+          "description": "Environment variable key-value pairs",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": "object",
+          "description": "Error messages for environment variables that could not be applied",
+          "properties": {
+            "errorCode": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "VpcConfig": {
+      "type": "object",
+      "description": "The VPC security groups and subnets attached to a Lambda function",
+      "properties": {
+        "subnetIds": {
+          "type": "array",
+          "description": "A list of VPC subnet IDs",
+          "items": {
+            "type": "string",
+            "pattern": "^subnet-[a-f0-9]{8,17}$"
+          }
+        },
+        "securityGroupIds": {
+          "type": "array",
+          "description": "A list of VPC security group IDs",
+          "items": {
+            "type": "string",
+            "pattern": "^sg-[a-f0-9]{8,17}$"
+          }
+        },
+        "vpcId": {
+          "type": "string",
+          "description": "The ID of the VPC",
+          "pattern": "^vpc-[a-f0-9]{8,17}$"
+        }
+      }
+    },
+    "Layer": {
+      "type": "object",
+      "description": "An AWS Lambda layer",
+      "properties": {
+        "arn": {
+          "type": "string",
+          "description": "The ARN of the function layer"
+        },
+        "codeSize": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The size of the layer archive in bytes"
+        }
+      }
+    },
+    "EphemeralStorage": {
+      "type": "object",
+      "description": "The function's ephemeral storage settings",
+      "properties": {
+        "size": {
+          "type": "integer",
+          "description": "The size of the /tmp directory in MB",
+          "minimum": 512,
+          "maximum": 10240,
+          "default": 512
+        }
+      },
+      "required": ["size"]
+    },
+    "TracingConfig": {
+      "type": "object",
+      "description": "The function's AWS X-Ray tracing configuration",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "The tracing mode",
+          "enum": ["Active", "PassThrough"]
+        }
+      }
+    }
+  }
+}
