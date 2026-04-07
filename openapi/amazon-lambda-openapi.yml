@@ -22,14 +22,14 @@ servers:
         default: us-east-1
         description: AWS Region
 tags:
-  - name: Functions
-    description: Operations for creating, managing, and invoking Lambda functions
-  - name: Event Source Mappings
-    description: Operations for managing event source mappings that trigger Lambda functions
-  - name: Layers
-    description: Operations for managing Lambda layers containing shared code and dependencies
   - name: Aliases
     description: Operations for managing function aliases that point to specific versions
+  - name: Event Source Mappings
+    description: Operations for managing event source mappings that trigger Lambda functions
+  - name: Functions
+    description: Operations for creating, managing, and invoking Lambda functions
+  - name: Layers
+    description: Operations for managing Lambda layers containing shared code and dependencies
   - name: Permissions
     description: Operations for managing resource-based policies on Lambda functions
   - name: Versions
