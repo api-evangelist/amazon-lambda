@@ -40,7 +40,7 @@ paths:
   /2015-03-31/functions:
     post:
       operationId: createFunction
-      summary: Create a Lambda function
+      summary: Amazon Lambda Create a Lambda function
       description: >-
         Creates a Lambda function. To create a function, you need a deployment
         package and an execution role. The deployment package is a .zip file
@@ -73,7 +73,7 @@ paths:
           description: Too many requests
     get:
       operationId: listFunctions
-      summary: List Lambda functions
+      summary: Amazon Lambda List Lambda functions
       description: >-
         Returns a list of Lambda functions, with the version-specific
         configuration of each. Lambda returns up to 50 functions per call.
@@ -122,7 +122,7 @@ paths:
   /2015-03-31/functions/{FunctionName}:
     get:
       operationId: getFunction
-      summary: Get a Lambda function
+      summary: Amazon Lambda Get a Lambda function
       description: >-
         Returns information about the function or function version, with a
         link to download the deployment package that is valid for 10 minutes.
@@ -154,7 +154,7 @@ paths:
           description: Too many requests
     delete:
       operationId: deleteFunction
-      summary: Delete a Lambda function
+      summary: Amazon Lambda Delete a Lambda function
       description: >-
         Deletes a Lambda function. To delete a specific function version, use
         the Qualifier parameter. Otherwise, all versions and aliases are
@@ -185,7 +185,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/code:
     put:
       operationId: updateFunctionCode
-      summary: Update function code
+      summary: Amazon Lambda Update function code
       description: >-
         Updates a Lambda function's code. If code signing is enabled for the
         function, the code package must be signed by a trusted publisher.
@@ -220,7 +220,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/configuration:
     get:
       operationId: getFunctionConfiguration
-      summary: Get function configuration
+      summary: Amazon Lambda Get function configuration
       description: >-
         Returns the version-specific settings of a Lambda function or version.
         The output includes only options that can vary between versions of a
@@ -249,7 +249,7 @@ paths:
           description: Too many requests
     put:
       operationId: updateFunctionConfiguration
-      summary: Update function configuration
+      summary: Amazon Lambda Update function configuration
       description: >-
         Modify the version-specific settings of a Lambda function. When you
         update a function, Lambda provisions an instance of the function and
@@ -283,7 +283,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/invocations:
     post:
       operationId: invoke
-      summary: Invoke a Lambda function
+      summary: Amazon Lambda Invoke a Lambda function
       description: >-
         Invokes a Lambda function. You can invoke a function synchronously
         and wait for the response, or asynchronously. By default, Lambda
@@ -365,7 +365,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/invoke-async:
     post:
       operationId: invokeAsync
-      summary: Invoke a function asynchronously (deprecated)
+      summary: Amazon Lambda Invoke a function asynchronously (deprecated)
       description: >-
         For asynchronous function invocation, use Invoke with InvocationType
         set to Event. This API is deprecated. Invokes a function
@@ -393,7 +393,7 @@ paths:
   /2015-03-31/event-source-mappings:
     post:
       operationId: createEventSourceMapping
-      summary: Create an event source mapping
+      summary: Amazon Lambda Create an event source mapping
       description: >-
         Creates a mapping between an event source and an AWS Lambda function.
         Lambda reads items from the event source and invokes the function.
@@ -426,7 +426,7 @@ paths:
           description: Too many requests
     get:
       operationId: listEventSourceMappings
-      summary: List event source mappings
+      summary: Amazon Lambda List event source mappings
       description: >-
         Lists event source mappings. Specify an EventSourceArn to show only
         event source mappings for a single event source, or a FunctionName
@@ -472,7 +472,7 @@ paths:
   /2015-03-31/layers:
     get:
       operationId: listLayers
-      summary: List Lambda layers
+      summary: Amazon Lambda List Lambda layers
       description: >-
         Lists Lambda layers and shows information about the latest version
         of each. Specify a compatible runtime to list only layers that are
@@ -537,7 +537,7 @@ paths:
   /2015-03-31/layers/{LayerName}/versions:
     post:
       operationId: publishLayerVersion
-      summary: Publish a layer version
+      summary: Amazon Lambda Publish a layer version
       description: >-
         Creates an AWS Lambda layer from a ZIP archive. Each time you call
         PublishLayerVersion with the same layer name, a new version is created.
@@ -572,7 +572,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/policy:
     post:
       operationId: addPermission
-      summary: Add a permission to a function policy
+      summary: Amazon Lambda Add a permission to a function policy
       description: >-
         Grants an AWS service, AWS account, or AWS organization permission
         to use a function. You can apply the policy at the function level,
@@ -613,7 +613,7 @@ paths:
           description: Too many requests
     get:
       operationId: getPolicy
-      summary: Get a function's resource-based policy
+      summary: Amazon Lambda Get a function's resource-based policy
       description: >-
         Returns the resource-based IAM policy for a function, version, or
         alias.
@@ -649,7 +649,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/versions:
     post:
       operationId: publishVersion
-      summary: Publish a function version
+      summary: Amazon Lambda Publish a function version
       description: >-
         Creates a version from the current code and configuration of a
         function. Use versions to create a snapshot of your function code and
@@ -695,7 +695,7 @@ paths:
   /2015-03-31/functions/{FunctionName}/aliases:
     post:
       operationId: createAlias
-      summary: Create a function alias
+      summary: Amazon Lambda Create a function alias
       description: >-
         Creates an alias for a Lambda function version. Use aliases to
         provide clients with a function identifier that you can update to
