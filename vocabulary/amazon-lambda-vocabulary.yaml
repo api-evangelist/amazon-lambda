@@ -1,0 +1,94 @@
+vocabulary: 1.0.0
+info:
+  provider: Amazon Lambda
+  description: Unified vocabulary for Amazon Lambda API operations and capability workflows.
+  created: '2026-04-19'
+  modified: '2026-04-19'
+operational:
+  apis:
+  - namespace: lambda
+    version: '2024-01-01'
+    status: active
+  resources:
+  - name: functions
+    api: lambda
+    actions:
+    - create function
+    - list functions
+    - get function
+    - update function code
+    - update function configuration
+    - delete function
+    - invoke function
+  - name: event-source-mappings
+    api: lambda
+    actions:
+    - create event source mapping
+    - list event source mappings
+    - get event source mapping
+    - delete event source mapping
+  actions:
+  - name: create
+    http_method: POST
+    pattern: write
+  - name: list
+    http_method: GET
+    pattern: read
+  - name: describe
+    http_method: GET
+    pattern: read
+  - name: update
+    http_method: PUT
+    pattern: write
+  - name: delete
+    http_method: DELETE
+    pattern: destructive
+  authentication:
+    schemes:
+    - type: apikey
+      header: Authorization
+      description: AWS Signature Version 4
+capability:
+  workflows:
+  - name: Amazon Lambda Workflow
+    file: capabilities/amazon-lambda-workflow.yaml
+    description: Unified workflow for Amazon Lambda resource management
+    apis_combined:
+    - lambda
+    tool_count: 6
+    personas:
+    - Developer
+    - Administrator
+  personas:
+  - id: developer
+    name: Developer
+    description: Integrates API into applications
+  - id: administrator
+    name: Administrator
+    description: Manages resources and configurations
+crossReference:
+- resource: functions
+  operations:
+  - CreateFunction
+  - ListFunctions
+  - GetFunction
+  - UpdateFunctionCode
+  - UpdateFunctionConfiguration
+  - DeleteFunction
+  - InvokeFunction
+  workflows:
+  - Amazon Lambda Workflow
+  personas:
+  - Developer
+  - Administrator
+- resource: event-source-mappings
+  operations:
+  - CreateEventSourceMapping
+  - ListEventSourceMappings
+  - GetEventSourceMapping
+  - DeleteEventSourceMapping
+  workflows:
+  - Amazon Lambda Workflow
+  personas:
+  - Developer
+  - Administrator

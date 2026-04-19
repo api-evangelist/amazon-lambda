@@ -1,0 +1,128 @@
+naftiko: 1.0.0-alpha1
+info:
+  label: Amazon Lambda
+  description: Amazon Lambda API for managing lambda resources.
+  tags:
+  - Amazon Lambda
+  - AWS
+  created: '2026-04-19'
+  modified: '2026-04-19'
+binds:
+- namespace: env
+  keys:
+    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: lambda
+    baseUri: https://lambda.us-east-1.amazonaws.com
+    description: Amazon Lambda service.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{AWS_ACCESS_KEY_ID}}'
+      placement: header
+    resources:
+    - name: functions
+      path: /functions
+      description: Lambda function management
+      operations:
+      - name: createfunction
+        method: POST
+        description: Creates a Lambda function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: listfunctions
+        method: GET
+        description: Returns a list of Lambda functions, with the version-specific configuration of each.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: getfunction
+        method: GET
+        description: Returns information about the function or function version.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: event-source-mappings
+      path: /event-source-mappings
+      description: Lambda event source mapping management
+      operations:
+      - name: createeventsourcemapping
+        method: POST
+        description: Creates a mapping between an event source and an AWS Lambda function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: listeventsourcemappings
+        method: GET
+        description: Lists event source mappings.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: geteventsourcemapping
+        method: GET
+        description: Returns details about an event source mapping.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    port: 8101
+    namespace: lambda-rest
+    resources: []
+  - type: mcp
+    port: 9101
+    namespace: lambda-mcp
+    transport: http
+    tools:
+    - name: createfunction
+      description: Creates a Lambda function.
+      hints:
+        readOnly: false
+        idempotent: false
+      call: lambda.createfunction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: listfunctions
+      description: Returns a list of Lambda functions, with the version-specific configuration of each.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.listfunctions
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: createeventsourcemapping
+      description: Creates a mapping between an event source and an AWS Lambda function.
+      hints:
+        readOnly: false
+        idempotent: false
+      call: lambda.createeventsourcemapping
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: listeventsourcemappings
+      description: Lists event source mappings.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.listeventsourcemappings
+      outputParameters:
+      - type: object
+        mapping: $.

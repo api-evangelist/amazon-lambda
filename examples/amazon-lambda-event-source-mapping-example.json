@@ -1,0 +1,7 @@
+{
+  "UUID": "abc12345-6789-def0-1234-abcdef012345",
+  "EventSourceArn": "arn:aws:service:us-east-1:123456789012:resource/example",
+  "FunctionArn": "arn:aws:service:us-east-1:123456789012:resource/example",
+  "State": "Enabled",
+  "BatchSize": 10
+}

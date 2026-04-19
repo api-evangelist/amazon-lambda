@@ -1,0 +1,85 @@
+naftiko: 1.0.0-alpha1
+info:
+  label: Amazon Lambda Workflow
+  description: Unified workflow capability for Amazon Lambda combining resource management and operations.
+  tags:
+  - Amazon Lambda
+  - AWS
+  - Workflow
+  created: '2026-04-19'
+  modified: '2026-04-19'
+binds:
+- namespace: env
+  keys:
+    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+capability:
+  consumes:
+  - import: lambda
+    location: ./shared/lambda.yaml
+  exposes:
+  - type: rest
+    port: 8080
+    namespace: lambda-api
+    description: REST API for Amazon Lambda workflow.
+    resources: []
+  - type: mcp
+    port: 9090
+    namespace: lambda-mcp
+    transport: http
+    description: MCP server for Amazon Lambda.
+    tools:
+    - name: functions-create-function
+      description: Creates a Lambda function.
+      hints:
+        readOnly: false
+        idempotent: false
+      call: lambda.createfunction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: functions-list-functions
+      description: Returns a list of Lambda functions, with the version-specific configuration of each.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.listfunctions
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: functions-get-function
+      description: Returns information about the function or function version.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.getfunction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: event-source-mappings-create-event-source-mapping
+      description: Creates a mapping between an event source and an AWS Lambda function.
+      hints:
+        readOnly: false
+        idempotent: false
+      call: lambda.createeventsourcemapping
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: event-source-mappings-list-event-source-mappings
+      description: Lists event source mappings.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.listeventsourcemappings
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: event-source-mappings-get-event-source-mapping
+      description: Returns details about an event source mapping.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: lambda.geteventsourcemapping
+      outputParameters:
+      - type: object
+        mapping: $.

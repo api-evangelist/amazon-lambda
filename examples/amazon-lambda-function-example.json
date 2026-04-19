@@ -1,0 +1,14 @@
+{
+  "FunctionName": "my-function",
+  "FunctionArn": "arn:aws:service:us-east-1:123456789012:resource/example",
+  "Runtime": "python3.12",
+  "Role": "example-value",
+  "Handler": "lambda_function.lambda_handler",
+  "CodeSize": 13,
+  "Description": "example-value",
+  "Timeout": 30,
+  "MemorySize": 128,
+  "LastModified": "2025-03-15T14:30:00Z",
+  "State": "Active",
+  "PackageType": "Zip"
+}

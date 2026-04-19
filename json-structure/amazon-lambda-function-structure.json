@@ -1,7 +1,7 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/api-evangelist/amazon-lambda/refs/heads/main/json-schema/amazon-lambda-function-schema.json",
-  "title": "Function",
+  "$schema": "https://json-structure.org/meta/core/v0/#",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/amazon-lambda/refs/heads/main/json-structure/amazon-lambda-function-structure.json",
+  "name": "Function",
   "description": "An AWS Lambda function.",
   "type": "object",
   "properties": {
@@ -38,7 +38,7 @@
       "example": "lambda_function.lambda_handler"
     },
     "CodeSize": {
-      "type": "integer",
+      "type": "int32",
       "description": "The size of the function's deployment package, in bytes."
     },
     "Description": {
@@ -46,19 +46,18 @@
       "description": "The function's description."
     },
     "Timeout": {
-      "type": "integer",
+      "type": "int32",
       "description": "The amount of time (in seconds) that Lambda allows a function to run.",
       "example": 30
     },
     "MemorySize": {
-      "type": "integer",
+      "type": "int32",
       "description": "The amount of memory available to the function at runtime.",
       "example": 128
     },
     "LastModified": {
-      "type": "string",
-      "description": "The date and time the function was last updated.",
-      "format": "date-time"
+      "type": "datetime",
+      "description": "The date and time the function was last updated."
     },
     "State": {
       "type": "string",

@@ -1,1391 +1,380 @@
 openapi: 3.1.0
 info:
   title: Amazon Lambda API
-  description: >-
-    AWS Lambda is a serverless compute service that lets you run code without
-    provisioning or managing servers. This API enables you to create, configure,
-    and invoke Lambda functions, manage event source mappings, layers, aliases,
-    and permissions for event-driven serverless applications.
-  version: '2015-03-31'
+  description: The Amazon Lambda API provides programmatic access to manage Lambda resources.
+  version: '2024-01-01'
   contact:
-    name: Amazon Web Services
-    url: https://aws.amazon.com/contact-us/
-  termsOfService: https://aws.amazon.com/service-terms/
-externalDocs:
-  description: Amazon Lambda API Reference
-  url: https://docs.aws.amazon.com/lambda/latest/api/
+    name: AWS Support
+    url: https://aws.amazon.com/premiumsupport/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  x-logo:
+    url: https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png
 servers:
-  - url: https://lambda.{region}.amazonaws.com
-    description: Amazon Lambda Regional Endpoint
-    variables:
-      region:
-        default: us-east-1
-        description: AWS Region
-tags:
-  - name: Aliases
-    description: Operations for managing function aliases that point to specific versions
-  - name: Event Source Mappings
-    description: Operations for managing event source mappings that trigger Lambda functions
-  - name: Functions
-    description: Operations for creating, managing, and invoking Lambda functions
-  - name: Layers
-    description: Operations for managing Lambda layers containing shared code and dependencies
-  - name: Permissions
-    description: Operations for managing resource-based policies on Lambda functions
-  - name: Versions
-    description: Operations for publishing and managing function versions
+- url: https://lambda.us-east-1.amazonaws.com
+  description: Amazon Lambda endpoint
 security:
-  - sigv4Auth: []
+- sigv4: []
+tags:
+- name: Functions
+  description: Lambda function management
+- name: Event Source Mappings
+  description: Lambda event source mapping management
 paths:
-  /2015-03-31/functions:
+  /functions:
     post:
-      operationId: createFunction
-      summary: Amazon Lambda Create a Lambda function
-      description: >-
-        Creates a Lambda function. To create a function, you need a deployment
-        package and an execution role. The deployment package is a .zip file
-        archive or container image that contains your function code. The
-        execution role grants the function permission to use AWS services.
+      operationId: CreateFunction
+      summary: Amazon Lambda Create Function
+      description: Creates a Lambda function.
       tags:
-        - Functions
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFunctionRequest'
+      - Functions
       responses:
-        '201':
-          description: Successfully created function
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionConfiguration'
+        '200':
+          description: Success
         '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
+          description: Bad request
         '403':
-          description: Authorization failure
-        '409':
-          description: Resource already exists
-        '429':
-          description: Too many requests
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
     get:
-      operationId: listFunctions
-      summary: Amazon Lambda List Lambda functions
-      description: >-
-        Returns a list of Lambda functions, with the version-specific
-        configuration of each. Lambda returns up to 50 functions per call.
-        Set FunctionVersion to ALL to include all published versions of each
-        function in addition to the unpublished version.
+      operationId: ListFunctions
+      summary: Amazon Lambda List Functions
+      description: Returns a list of Lambda functions, with the version-specific configuration of each.
       tags:
-        - Functions
-      parameters:
-        - name: FunctionVersion
-          in: query
-          description: Set to ALL to include entries for all published versions
-          schema:
-            type: string
-            enum:
-              - ALL
-        - name: Marker
-          in: query
-          description: Pagination token returned by a previous call
-          schema:
-            type: string
-        - name: MaxItems
-          in: query
-          description: Maximum number of functions to return
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 10000
-        - name: MasterRegion
-          in: query
-          description: Display the functions of the specified region
-          schema:
-            type: string
+      - Functions
       responses:
         '200':
-          description: Successfully listed functions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListFunctionsResponse'
+          description: Success
         '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}:
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /functions/{FunctionName}:
     get:
-      operationId: getFunction
-      summary: Amazon Lambda Get a Lambda function
-      description: >-
-        Returns information about the function or function version, with a
-        link to download the deployment package that is valid for 10 minutes.
-        If you specify a function version, only details that are specific to
-        that version are returned.
+      operationId: GetFunction
+      summary: Amazon Lambda Get Function
+      description: Returns information about the function or function version.
       tags:
-        - Functions
+      - Functions
       parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: Qualifier
-          in: query
-          description: A version number or alias name
-          schema:
-            type: string
+      - name: FunctionName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the Lambda function.
       responses:
         '200':
-          description: Successfully retrieved function
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetFunctionResponse'
+          description: Success
         '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
-        '404':
-          description: Function not found
-        '429':
-          description: Too many requests
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
     delete:
-      operationId: deleteFunction
-      summary: Amazon Lambda Delete a Lambda function
-      description: >-
-        Deletes a Lambda function. To delete a specific function version, use
-        the Qualifier parameter. Otherwise, all versions and aliases are
-        deleted. To delete Lambda event source mappings that invoke a function,
-        use DeleteEventSourceMapping.
+      operationId: DeleteFunction
+      summary: Amazon Lambda Delete Function
+      description: Deletes a Lambda function.
       tags:
-        - Functions
+      - Functions
       parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: Qualifier
-          in: query
-          description: A version number or alias name to delete
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Successfully deleted function
-        '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
-        '404':
-          description: Function not found
-        '409':
-          description: Resource in use
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/code:
-    put:
-      operationId: updateFunctionCode
-      summary: Amazon Lambda Update function code
-      description: >-
-        Updates a Lambda function's code. If code signing is enabled for the
-        function, the code package must be signed by a trusted publisher.
-        The function's code is locked when you publish a version.
-      tags:
-        - Functions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-      requestBody:
+      - name: FunctionName
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateFunctionCodeRequest'
+        schema:
+          type: string
+        description: The name of the Lambda function.
       responses:
         '200':
-          description: Successfully updated function code
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionConfiguration'
+          description: Success
         '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
-        '404':
-          description: Function not found
-        '409':
-          description: Resource conflict
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/configuration:
-    get:
-      operationId: getFunctionConfiguration
-      summary: Amazon Lambda Get function configuration
-      description: >-
-        Returns the version-specific settings of a Lambda function or version.
-        The output includes only options that can vary between versions of a
-        function.
-      tags:
-        - Functions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: Qualifier
-          in: query
-          description: A version number or alias name
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successfully retrieved function configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionConfiguration'
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '429':
-          description: Too many requests
-    put:
-      operationId: updateFunctionConfiguration
-      summary: Amazon Lambda Update function configuration
-      description: >-
-        Modify the version-specific settings of a Lambda function. When you
-        update a function, Lambda provisions an instance of the function and
-        its supporting resources. The function's code is locked during the
-        update operation.
-      tags:
-        - Functions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateFunctionConfigurationRequest'
-      responses:
-        '200':
-          description: Successfully updated function configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionConfiguration'
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '409':
-          description: Resource conflict
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/invocations:
-    post:
-      operationId: invoke
-      summary: Amazon Lambda Invoke a Lambda function
-      description: >-
-        Invokes a Lambda function. You can invoke a function synchronously
-        and wait for the response, or asynchronously. By default, Lambda
-        invokes your function synchronously. To invoke a function
-        asynchronously, set InvocationType to Event.
-      tags:
-        - Functions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: X-Amz-Invocation-Type
-          in: header
-          description: >-
-            Choose from RequestResponse (synchronous), Event (asynchronous),
-            or DryRun (validate parameters and permissions)
-          schema:
-            type: string
-            enum:
-              - Event
-              - RequestResponse
-              - DryRun
-        - name: X-Amz-Log-Type
-          in: header
-          description: Set to Tail to include the execution log in the response
-          schema:
-            type: string
-            enum:
-              - None
-              - Tail
-        - name: X-Amz-Client-Context
-          in: header
-          description: Up to 3,583 bytes of base64-encoded client context data
-          schema:
-            type: string
-        - name: Qualifier
-          in: query
-          description: A version number or alias name
-          schema:
-            type: string
-      requestBody:
-        description: The JSON payload to pass to the function
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        '200':
-          description: Successfully invoked function (synchronous)
-          headers:
-            X-Amz-Function-Error:
-              description: If present, indicates that an error occurred
-              schema:
-                type: string
-            X-Amz-Log-Result:
-              description: The last 4 KB of the execution log (base64-encoded)
-              schema:
-                type: string
-            X-Amz-Executed-Version:
-              description: The version of the function that executed
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-        '202':
-          description: Successfully invoked function (asynchronous)
-        '204':
-          description: Dry run successful
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '429':
-          description: Too many requests
-        '502':
-          description: Function returned an error
-        '504':
-          description: Function timed out
-  /2015-03-31/functions/{FunctionName}/invoke-async:
-    post:
-      operationId: invokeAsync
-      summary: Amazon Lambda Invoke a function asynchronously (deprecated)
-      description: >-
-        For asynchronous function invocation, use Invoke with InvocationType
-        set to Event. This API is deprecated. Invokes a function
-        asynchronously.
-      deprecated: true
-      tags:
-        - Functions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-      requestBody:
-        description: The JSON payload to pass to the function
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        '202':
-          description: Successfully queued invocation
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '429':
-          description: Too many requests
-  /2015-03-31/event-source-mappings:
-    post:
-      operationId: createEventSourceMapping
-      summary: Amazon Lambda Create an event source mapping
-      description: >-
-        Creates a mapping between an event source and an AWS Lambda function.
-        Lambda reads items from the event source and invokes the function.
-        Event sources include Amazon SQS, Amazon Kinesis, Amazon DynamoDB
-        Streams, Amazon MSK, and self-managed Apache Kafka.
-      tags:
-        - Event Source Mappings
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateEventSourceMappingRequest'
-      responses:
-        '202':
-          description: Successfully created event source mapping
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventSourceMappingConfiguration'
-        '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
+          description: Bad request
         '403':
-          description: Authorization failure
-        '409':
-          description: Resource already exists
-        '429':
-          description: Too many requests
-    get:
-      operationId: listEventSourceMappings
-      summary: Amazon Lambda List event source mappings
-      description: >-
-        Lists event source mappings. Specify an EventSourceArn to show only
-        event source mappings for a single event source, or a FunctionName
-        to show only mappings for a single function.
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /functions/{FunctionName}/code:
+    put:
+      operationId: UpdateFunctionCode
+      summary: Amazon Lambda Update Function Code
+      description: Updates a Lambda function's code.
       tags:
-        - Event Source Mappings
+      - Functions
       parameters:
-        - name: EventSourceArn
-          in: query
-          description: The ARN of the event source
-          schema:
-            type: string
-        - name: FunctionName
-          in: query
-          description: The name or ARN of the Lambda function
-          schema:
-            type: string
-        - name: Marker
-          in: query
-          description: Pagination token returned by a previous call
-          schema:
-            type: string
-        - name: MaxItems
-          in: query
-          description: Maximum number of event source mappings to return
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 10000
+      - name: FunctionName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the Lambda function.
       responses:
         '200':
-          description: Successfully listed event source mappings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListEventSourceMappingsResponse'
+          description: Success
         '400':
-          description: Invalid request parameters
-        '401':
-          description: Authentication failure
-        '429':
-          description: Too many requests
-  /2015-03-31/layers:
-    get:
-      operationId: listLayers
-      summary: Amazon Lambda List Lambda layers
-      description: >-
-        Lists Lambda layers and shows information about the latest version
-        of each. Specify a compatible runtime to list only layers that are
-        compatible with that runtime.
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /functions/{FunctionName}/configuration:
+    put:
+      operationId: UpdateFunctionConfiguration
+      summary: Amazon Lambda Update Function Configuration
+      description: Modify the version-specific settings of a Lambda function.
       tags:
-        - Layers
+      - Functions
       parameters:
-        - name: CompatibleRuntime
-          in: query
-          description: A runtime identifier to filter compatible layers
-          schema:
-            type: string
-            enum:
-              - nodejs18.x
-              - nodejs20.x
-              - nodejs22.x
-              - python3.9
-              - python3.10
-              - python3.11
-              - python3.12
-              - python3.13
-              - java11
-              - java17
-              - java21
-              - dotnet6
-              - dotnet8
-              - ruby3.2
-              - ruby3.3
-              - provided.al2
-              - provided.al2023
-        - name: CompatibleArchitecture
-          in: query
-          description: A compatible instruction set architecture
-          schema:
-            type: string
-            enum:
-              - x86_64
-              - arm64
-        - name: Marker
-          in: query
-          description: Pagination token returned by a previous call
-          schema:
-            type: string
-        - name: MaxItems
-          in: query
-          description: Maximum number of layers to return
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
+      - name: FunctionName
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the Lambda function.
       responses:
         '200':
-          description: Successfully listed layers
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListLayersResponse'
+          description: Success
         '400':
-          description: Invalid request parameters
-        '429':
-          description: Too many requests
-  /2015-03-31/layers/{LayerName}/versions:
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /functions/{FunctionName}/invocations:
     post:
-      operationId: publishLayerVersion
-      summary: Amazon Lambda Publish a layer version
-      description: >-
-        Creates an AWS Lambda layer from a ZIP archive. Each time you call
-        PublishLayerVersion with the same layer name, a new version is created.
-        Add layers to your function with CreateFunction or
-        UpdateFunctionConfiguration.
+      operationId: InvokeFunction
+      summary: Amazon Lambda Invoke Function
+      description: Invokes a Lambda function.
       tags:
-        - Layers
+      - Functions
       parameters:
-        - name: LayerName
-          in: path
-          required: true
-          description: The name or ARN of the layer
-          schema:
-            type: string
-      requestBody:
+      - name: FunctionName
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PublishLayerVersionRequest'
-      responses:
-        '201':
-          description: Successfully published layer version
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublishLayerVersionResponse'
-        '400':
-          description: Invalid request parameters
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/policy:
-    post:
-      operationId: addPermission
-      summary: Amazon Lambda Add a permission to a function policy
-      description: >-
-        Grants an AWS service, AWS account, or AWS organization permission
-        to use a function. You can apply the policy at the function level,
-        or specify a qualifier to restrict access to a single version or alias.
-      tags:
-        - Permissions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: Qualifier
-          in: query
-          description: A version number or alias name
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddPermissionRequest'
-      responses:
-        '201':
-          description: Successfully added permission
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  Statement:
-                    type: string
-                    description: The permission statement added to the policy
-        '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '409':
-          description: Resource conflict
-        '429':
-          description: Too many requests
-    get:
-      operationId: getPolicy
-      summary: Amazon Lambda Get a function's resource-based policy
-      description: >-
-        Returns the resource-based IAM policy for a function, version, or
-        alias.
-      tags:
-        - Permissions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-        - name: Qualifier
-          in: query
-          description: A version number or alias name
-          schema:
-            type: string
+        schema:
+          type: string
+        description: The name of the Lambda function.
       responses:
         '200':
-          description: Successfully retrieved policy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  Policy:
-                    type: string
-                    description: The resource-based policy as a JSON string
-                  RevisionId:
-                    type: string
-                    description: A unique identifier for the current revision of the policy
+          description: Success
         '400':
-          description: Invalid request parameters
-        '404':
-          description: Function or policy not found
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/versions:
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /event-source-mappings:
     post:
-      operationId: publishVersion
-      summary: Amazon Lambda Publish a function version
-      description: >-
-        Creates a version from the current code and configuration of a
-        function. Use versions to create a snapshot of your function code and
-        configuration that does not change.
+      operationId: CreateEventSourceMapping
+      summary: Amazon Lambda Create Event Source Mapping
+      description: Creates a mapping between an event source and an AWS Lambda function.
       tags:
-        - Versions
-      parameters:
-        - $ref: '#/components/parameters/FunctionName'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                CodeSha256:
-                  type: string
-                  description: >-
-                    Only publish a version if the hash matches the value
-                    specified
-                Description:
-                  type: string
-                  description: A description for the version
-                RevisionId:
-                  type: string
-                  description: >-
-                    Only update the function if the revision ID matches the
-                    specified ID
+      - Event Source Mappings
       responses:
-        '201':
-          description: Successfully published version
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FunctionConfiguration'
+        '200':
+          description: Success
         '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '409':
-          description: Resource conflict
-        '429':
-          description: Too many requests
-  /2015-03-31/functions/{FunctionName}/aliases:
-    post:
-      operationId: createAlias
-      summary: Amazon Lambda Create a function alias
-      description: >-
-        Creates an alias for a Lambda function version. Use aliases to
-        provide clients with a function identifier that you can update to
-        invoke a different version. You can also map an alias to split
-        invocation requests between two versions using routing configuration.
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+    get:
+      operationId: ListEventSourceMappings
+      summary: Amazon Lambda List Event Source Mappings
+      description: Lists event source mappings.
       tags:
-        - Aliases
+      - Event Source Mappings
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /event-source-mappings/{UUID}:
+    get:
+      operationId: GetEventSourceMapping
+      summary: Amazon Lambda Get Event Source Mapping
+      description: Returns details about an event source mapping.
+      tags:
+      - Event Source Mappings
       parameters:
-        - $ref: '#/components/parameters/FunctionName'
-      requestBody:
+      - name: UUID
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - FunctionVersion
-                - Name
-              properties:
-                Description:
-                  type: string
-                  description: A description of the alias
-                FunctionVersion:
-                  type: string
-                  description: The function version that the alias invokes
-                Name:
-                  type: string
-                  description: The name of the alias
-                RoutingConfig:
-                  $ref: '#/components/schemas/AliasRoutingConfiguration'
+        schema:
+          type: string
+        description: The identifier of the event source mapping.
       responses:
-        '201':
-          description: Successfully created alias
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AliasConfiguration'
+        '200':
+          description: Success
         '400':
-          description: Invalid request parameters
-        '404':
-          description: Function not found
-        '409':
-          description: Resource already exists
-        '429':
-          description: Too many requests
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+    delete:
+      operationId: DeleteEventSourceMapping
+      summary: Amazon Lambda Delete Event Source Mapping
+      description: Deletes an event source mapping.
+      tags:
+      - Event Source Mappings
+      parameters:
+      - name: UUID
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The identifier of the event source mapping.
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
 components:
   securitySchemes:
-    sigv4Auth:
+    sigv4:
       type: apiKey
       name: Authorization
       in: header
       description: AWS Signature Version 4 authentication
-  parameters:
-    FunctionName:
-      name: FunctionName
-      in: path
-      required: true
-      description: >-
-        The name or ARN of the Lambda function, version, or alias. Formats
-        include function name, function ARN, partial ARN, or a function name
-        with a qualifier.
-      schema:
-        type: string
   schemas:
-    CreateFunctionRequest:
+    Function:
       type: object
-      required:
-        - FunctionName
-        - Role
-        - Code
+      description: An AWS Lambda function.
       properties:
         FunctionName:
           type: string
-          description: The name of the Lambda function
-          minLength: 1
-          maxLength: 140
-        Runtime:
-          type: string
-          description: The runtime environment for the function
-          enum:
-            - nodejs18.x
-            - nodejs20.x
-            - nodejs22.x
-            - python3.9
-            - python3.10
-            - python3.11
-            - python3.12
-            - python3.13
-            - java11
-            - java17
-            - java21
-            - dotnet6
-            - dotnet8
-            - ruby3.2
-            - ruby3.3
-            - provided.al2
-            - provided.al2023
-        Role:
-          type: string
-          description: The ARN of the function's execution role
-        Handler:
-          type: string
-          description: The name of the method within your code that Lambda calls
-        Code:
-          $ref: '#/components/schemas/FunctionCode'
-        Description:
-          type: string
-          description: A description of the function
-          maxLength: 256
-        Timeout:
-          type: integer
-          description: Function execution time limit in seconds
-          minimum: 1
-          maximum: 900
-          default: 3
-        MemorySize:
-          type: integer
-          description: Amount of memory available to the function in MB
-          minimum: 128
-          maximum: 10240
-          default: 128
-        Environment:
-          type: object
-          description: Environment variables for the function
-          properties:
-            Variables:
-              type: object
-              additionalProperties:
-                type: string
-        VpcConfig:
-          $ref: '#/components/schemas/VpcConfig'
-        Layers:
-          type: array
-          description: A list of function layers to add
-          items:
-            type: string
-          maxItems: 5
-        Architectures:
-          type: array
-          description: The instruction set architecture
-          items:
-            type: string
-            enum:
-              - x86_64
-              - arm64
-          maxItems: 1
-        EphemeralStorage:
-          type: object
-          description: The size of the /tmp directory
-          properties:
-            Size:
-              type: integer
-              minimum: 512
-              maximum: 10240
-        PackageType:
-          type: string
-          description: The type of deployment package
-          enum:
-            - Zip
-            - Image
-        Tags:
-          type: object
-          description: Tags to apply to the function
-          additionalProperties:
-            type: string
-    UpdateFunctionCodeRequest:
-      type: object
-      properties:
-        S3Bucket:
-          type: string
-          description: The S3 bucket containing the deployment package
-        S3Key:
-          type: string
-          description: The S3 key of the deployment package
-        S3ObjectVersion:
-          type: string
-          description: The S3 object version of the deployment package
-        ZipFile:
-          type: string
-          format: byte
-          description: Base64-encoded contents of the deployment package
-        ImageUri:
-          type: string
-          description: URI of a container image in ECR
-        Architectures:
-          type: array
-          description: The instruction set architecture
-          items:
-            type: string
-            enum:
-              - x86_64
-              - arm64
-          maxItems: 1
-    UpdateFunctionConfigurationRequest:
-      type: object
-      properties:
-        Runtime:
-          type: string
-          description: The runtime environment for the function
-        Role:
-          type: string
-          description: The ARN of the function's execution role
-        Handler:
-          type: string
-          description: The name of the method within your code that Lambda calls
-        Description:
-          type: string
-          description: A description of the function
-        Timeout:
-          type: integer
-          description: Function execution time limit in seconds
-          minimum: 1
-          maximum: 900
-        MemorySize:
-          type: integer
-          description: Amount of memory available to the function in MB
-          minimum: 128
-          maximum: 10240
-        Environment:
-          type: object
-          description: Environment variables for the function
-          properties:
-            Variables:
-              type: object
-              additionalProperties:
-                type: string
-        VpcConfig:
-          $ref: '#/components/schemas/VpcConfig'
-        Layers:
-          type: array
-          description: A list of function layers to add
-          items:
-            type: string
-          maxItems: 5
-        EphemeralStorage:
-          type: object
-          description: The size of the /tmp directory
-          properties:
-            Size:
-              type: integer
-              minimum: 512
-              maximum: 10240
-    CreateEventSourceMappingRequest:
-      type: object
-      required:
-        - FunctionName
-      properties:
-        EventSourceArn:
-          type: string
-          description: The ARN of the event source
-        FunctionName:
-          type: string
-          description: The name or ARN of the Lambda function
-        Enabled:
-          type: boolean
-          description: Whether the event source mapping is active
-          default: true
-        BatchSize:
-          type: integer
-          description: The maximum number of records in each batch
-          minimum: 1
-          maximum: 10000
-        MaximumBatchingWindowInSeconds:
-          type: integer
-          description: Maximum time to gather records before invoking the function
-          minimum: 0
-          maximum: 300
-        StartingPosition:
-          type: string
-          description: The position in a stream from which to start reading
-          enum:
-            - TRIM_HORIZON
-            - LATEST
-            - AT_TIMESTAMP
-        StartingPositionTimestamp:
-          type: string
-          format: date-time
-          description: The timestamp to start reading (with AT_TIMESTAMP)
-        FilterCriteria:
-          type: object
-          description: Criteria to filter events before invoking the function
-          properties:
-            Filters:
-              type: array
-              items:
-                type: object
-                properties:
-                  Pattern:
-                    type: string
-    PublishLayerVersionRequest:
-      type: object
-      required:
-        - Content
-      properties:
-        Content:
-          type: object
-          description: The function layer archive
-          properties:
-            S3Bucket:
-              type: string
-              description: The S3 bucket containing the layer archive
-            S3Key:
-              type: string
-              description: The S3 key of the layer archive
-            S3ObjectVersion:
-              type: string
-              description: The S3 object version of the layer archive
-            ZipFile:
-              type: string
-              format: byte
-              description: Base64-encoded contents of the layer archive
-        Description:
-          type: string
-          description: A description of the layer version
-        CompatibleRuntimes:
-          type: array
-          description: Compatible runtimes for the layer
-          items:
-            type: string
-          maxItems: 15
-        LicenseInfo:
-          type: string
-          description: The layer's software license
-        CompatibleArchitectures:
-          type: array
-          description: Compatible instruction set architectures
-          items:
-            type: string
-            enum:
-              - x86_64
-              - arm64
-          maxItems: 2
-    AddPermissionRequest:
-      type: object
-      required:
-        - Action
-        - Principal
-        - StatementId
-      properties:
-        Action:
-          type: string
-          description: The action that the principal can use on the function
-        FunctionUrlAuthType:
-          type: string
-          description: The type of authentication for the function URL
-          enum:
-            - NONE
-            - AWS_IAM
-        Principal:
-          type: string
-          description: The AWS service or account that invokes the function
-        SourceArn:
-          type: string
-          description: The ARN of the AWS resource that invokes the function
-        SourceAccount:
-          type: string
-          description: The AWS account ID of the resource owner
-        StatementId:
-          type: string
-          description: A statement identifier that differentiates the statement
-    FunctionConfiguration:
-      type: object
-      description: Details about a Lambda function's configuration
-      properties:
-        FunctionName:
-          type: string
-          description: The name of the function
+          description: The name of the function.
+          example: my-function
         FunctionArn:
           type: string
-          description: The function's Amazon Resource Name (ARN)
+          description: The function's Amazon Resource Name (ARN).
         Runtime:
           type: string
-          description: The runtime environment for the function
+          description: The function's runtime identifier.
+          example: python3.12
+          enum:
+          - nodejs20.x
+          - python3.12
+          - java21
+          - go1.x
+          - ruby3.2
+          - dotnet8
+          - provided.al2023
         Role:
           type: string
-          description: The function's execution role ARN
+          description: The function's execution role ARN.
         Handler:
           type: string
-          description: The function that Lambda calls to begin execution
+          description: The function that Lambda calls to begin execution.
+          example: lambda_function.lambda_handler
         CodeSize:
           type: integer
-          format: int64
-          description: The size of the function's deployment package in bytes
+          description: The size of the function's deployment package, in bytes.
         Description:
           type: string
-          description: The function's description
+          description: The function's description.
         Timeout:
           type: integer
-          description: The amount of time in seconds that Lambda allows a function to run
+          description: The amount of time (in seconds) that Lambda allows a function to run.
+          example: 30
         MemorySize:
           type: integer
-          description: The amount of memory available to the function in MB
+          description: The amount of memory available to the function at runtime.
+          example: 128
         LastModified:
           type: string
-          description: The date and time the function was last updated
-        CodeSha256:
-          type: string
-          description: The SHA256 hash of the function's deployment package
-        Version:
-          type: string
-          description: The version of the Lambda function
-        VpcConfig:
-          $ref: '#/components/schemas/VpcConfigResponse'
-        Environment:
-          type: object
-          description: The function's environment variables
-          properties:
-            Variables:
-              type: object
-              additionalProperties:
-                type: string
+          description: The date and time the function was last updated.
+          format: date-time
         State:
           type: string
-          description: The current state of the function
+          description: The current state of the function.
+          example: Active
           enum:
-            - Pending
-            - Active
-            - Inactive
-            - Failed
-        StateReason:
-          type: string
-          description: The reason for the function's current state
-        Layers:
-          type: array
-          description: The function's layers
-          items:
-            type: object
-            properties:
-              Arn:
-                type: string
-              CodeSize:
-                type: integer
-                format: int64
-        Architectures:
-          type: array
-          description: The instruction set architecture
-          items:
-            type: string
-        EphemeralStorage:
-          type: object
-          description: The size of the /tmp directory
-          properties:
-            Size:
-              type: integer
+          - Pending
+          - Active
+          - Inactive
+          - Failed
         PackageType:
           type: string
-          description: The type of deployment package
+          description: The type of deployment package.
+          example: Zip
           enum:
-            - Zip
-            - Image
-        RevisionId:
-          type: string
-          description: The latest updated revision of the function or alias
-    FunctionCode:
+          - Zip
+          - Image
+    EventSourceMapping:
       type: object
-      description: The code for the Lambda function
-      properties:
-        S3Bucket:
-          type: string
-          description: The S3 bucket containing the deployment package
-        S3Key:
-          type: string
-          description: The S3 key of the deployment package
-        S3ObjectVersion:
-          type: string
-          description: The S3 object version of the deployment package
-        ZipFile:
-          type: string
-          format: byte
-          description: Base64-encoded contents of the deployment package
-        ImageUri:
-          type: string
-          description: URI of a container image in the ECR registry
-    VpcConfig:
-      type: object
-      description: The VPC security groups and subnets attached to a function
-      properties:
-        SubnetIds:
-          type: array
-          description: A list of VPC subnet IDs
-          items:
-            type: string
-        SecurityGroupIds:
-          type: array
-          description: A list of VPC security group IDs
-          items:
-            type: string
-    VpcConfigResponse:
-      type: object
-      description: The VPC security groups and subnets attached to a function
-      properties:
-        SubnetIds:
-          type: array
-          items:
-            type: string
-        SecurityGroupIds:
-          type: array
-          items:
-            type: string
-        VpcId:
-          type: string
-          description: The ID of the VPC
-    EventSourceMappingConfiguration:
-      type: object
-      description: A mapping between an AWS resource and a Lambda function
+      description: A Lambda event source mapping that connects an event source to a Lambda function.
       properties:
         UUID:
           type: string
-          description: The identifier of the event source mapping
+          description: The identifier of the event source mapping.
+          example: abc12345-6789-def0-1234-abcdef012345
         EventSourceArn:
           type: string
-          description: The ARN of the event source
+          description: The ARN of the event source.
         FunctionArn:
           type: string
-          description: The ARN of the Lambda function
+          description: The ARN of the Lambda function.
         State:
           type: string
-          description: The state of the event source mapping
+          description: The state of the event source mapping.
+          example: Enabled
           enum:
-            - Creating
-            - Enabling
-            - Enabled
-            - Disabling
-            - Disabled
-            - Updating
-            - Deleting
+          - Creating
+          - Enabling
+          - Enabled
+          - Disabling
+          - Disabled
+          - Updating
+          - Deleting
         BatchSize:
           type: integer
-          description: The maximum number of records in each batch
-        MaximumBatchingWindowInSeconds:
-          type: integer
-          description: Maximum time to gather records before invoking
-        LastModified:
-          type: string
-          format: date-time
-          description: The date that the event source mapping was last updated
-        StartingPosition:
-          type: string
-          description: The position in a stream from which to start reading
-    AliasConfiguration:
-      type: object
-      description: Provides configuration information about a Lambda function alias
-      properties:
-        AliasArn:
-          type: string
-          description: The ARN of the alias
-        Name:
-          type: string
-          description: The name of the alias
-        FunctionVersion:
-          type: string
-          description: The function version that the alias invokes
-        Description:
-          type: string
-          description: A description of the alias
-        RoutingConfig:
-          $ref: '#/components/schemas/AliasRoutingConfiguration'
-        RevisionId:
-          type: string
-          description: A unique identifier for the current revision of the alias
-    AliasRoutingConfiguration:
-      type: object
-      description: >-
-        The traffic-shifting configuration of a Lambda function alias for
-        weighted alias routing
-      properties:
-        AdditionalVersionWeights:
-          type: object
-          description: >-
-            The second version and the percentage of traffic routed to it
-          additionalProperties:
-            type: number
-            minimum: 0
-            maximum: 1
-    GetFunctionResponse:
-      type: object
-      description: Response from the GetFunction action
-      properties:
-        Configuration:
-          $ref: '#/components/schemas/FunctionConfiguration'
-        Code:
-          type: object
-          properties:
-            RepositoryType:
-              type: string
-              description: The service that hosts the deployment package
-            Location:
-              type: string
-              description: A presigned URL to download the deployment package
-            ImageUri:
-              type: string
-              description: The URI of the container image
-        Tags:
-          type: object
-          description: The function's tags
-          additionalProperties:
-            type: string
-    ListFunctionsResponse:
-      type: object
-      description: Response from the ListFunctions action
-      properties:
-        Functions:
-          type: array
-          description: A list of Lambda functions
-          items:
-            $ref: '#/components/schemas/FunctionConfiguration'
-        NextMarker:
-          type: string
-          description: Pagination token for the next page of results
-    ListEventSourceMappingsResponse:
-      type: object
-      description: Response from the ListEventSourceMappings action
-      properties:
-        EventSourceMappings:
-          type: array
-          description: A list of event source mappings
-          items:
-            $ref: '#/components/schemas/EventSourceMappingConfiguration'
-        NextMarker:
-          type: string
-          description: Pagination token for the next page of results
-    ListLayersResponse:
-      type: object
-      description: Response from the ListLayers action
-      properties:
-        Layers:
-          type: array
-          description: A list of function layers
-          items:
-            type: object
-            properties:
-              LayerName:
-                type: string
-                description: The name of the layer
-              LayerArn:
-                type: string
-                description: The ARN of the layer
-              LatestMatchingVersion:
-                type: object
-                properties:
-                  LayerVersionArn:
-                    type: string
-                  Version:
-                    type: integer
-                    format: int64
-                  Description:
-                    type: string
-                  CompatibleRuntimes:
-                    type: array
-                    items:
-                      type: string
-                  CreatedDate:
-                    type: string
-                  CompatibleArchitectures:
-                    type: array
-                    items:
-                      type: string
-        NextMarker:
-          type: string
-          description: Pagination token for the next page of results
-    PublishLayerVersionResponse:
-      type: object
-      description: Response from the PublishLayerVersion action
-      properties:
-        LayerArn:
-          type: string
-          description: The ARN of the layer
-        LayerVersionArn:
-          type: string
-          description: The ARN of the layer version
-        Description:
-          type: string
-          description: The description of the version
-        Version:
-          type: integer
-          format: int64
-          description: The version number
-        CompatibleRuntimes:
-          type: array
-          description: The layer's compatible runtimes
-          items:
-            type: string
-        CompatibleArchitectures:
-          type: array
-          description: Compatible instruction set architectures
-          items:
-            type: string
-        CreatedDate:
-          type: string
-          description: The date that the layer version was created
-        LicenseInfo:
-          type: string
-          description: The layer's software license
+          description: The maximum number of records in each batch.
+          example: 10

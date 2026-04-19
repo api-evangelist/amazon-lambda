@@ -1,109 +1,39 @@
 {
   "@context": {
     "@version": 1.1,
-    "lambda": "https://docs.aws.amazon.com/lambda/latest/api/",
+    "lambda": "https://lambda.amazonaws.com/schema/",
     "schema": "https://schema.org/",
-    "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dcterms": "http://purl.org/dc/terms/",
-
-    "Function": {
-      "@id": "lambda:Function",
-      "@context": {
-        "functionName": "schema:name",
-        "functionArn": "lambda:functionArn",
-        "runtime": "lambda:runtime",
-        "handler": "lambda:handler",
-        "role": "lambda:role",
-        "codeSize": "lambda:codeSize",
-        "description": "schema:description",
-        "timeout": "lambda:timeout",
-        "memorySize": "lambda:memorySize",
-        "lastModified": {
-          "@id": "dcterms:modified",
-          "@type": "xsd:dateTime"
-        },
-        "version": "lambda:version",
-        "state": "lambda:state",
-        "packageType": "lambda:packageType",
-        "architectures": {
-          "@id": "lambda:architectures",
-          "@container": "@set"
-        },
-        "layers": {
-          "@id": "lambda:layers",
-          "@container": "@set"
-        },
-        "tags": {
-          "@id": "lambda:tags",
-          "@container": "@set"
-        }
-      }
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Function": "lambda:Function",
+    "EventSourceMapping": "lambda:EventSourceMapping",
+    "id": {
+      "@id": "schema:identifier",
+      "@type": "xsd:string"
     },
-
-    "Layer": {
-      "@id": "lambda:Layer",
-      "@context": {
-        "layerName": "schema:name",
-        "layerArn": "lambda:layerArn",
-        "layerVersionArn": "lambda:layerVersionArn",
-        "description": "schema:description",
-        "version": "lambda:version",
-        "compatibleRuntimes": {
-          "@id": "lambda:compatibleRuntimes",
-          "@container": "@set"
-        },
-        "compatibleArchitectures": {
-          "@id": "lambda:compatibleArchitectures",
-          "@container": "@set"
-        },
-        "createdDate": {
-          "@id": "dcterms:created",
-          "@type": "xsd:dateTime"
-        },
-        "licenseInfo": "lambda:licenseInfo"
-      }
+    "name": {
+      "@id": "schema:name",
+      "@type": "xsd:string"
     },
-
-    "EventSourceMapping": {
-      "@id": "lambda:EventSourceMapping",
-      "@context": {
-        "uuid": "lambda:uuid",
-        "eventSourceArn": "lambda:eventSourceArn",
-        "functionArn": "lambda:functionArn",
-        "state": "lambda:state",
-        "batchSize": "lambda:batchSize",
-        "maximumBatchingWindowInSeconds": "lambda:maximumBatchingWindowInSeconds",
-        "startingPosition": "lambda:startingPosition",
-        "lastModified": {
-          "@id": "dcterms:modified",
-          "@type": "xsd:dateTime"
-        }
-      }
+    "description": {
+      "@id": "schema:description",
+      "@type": "xsd:string"
     },
-
-    "Alias": {
-      "@id": "lambda:Alias",
-      "@context": {
-        "aliasArn": "lambda:aliasArn",
-        "name": "schema:name",
-        "functionVersion": "lambda:functionVersion",
-        "description": "schema:description",
-        "routingConfig": "lambda:routingConfig",
-        "revisionId": "lambda:revisionId"
-      }
+    "status": {
+      "@id": "lambda:status",
+      "@type": "xsd:string"
     },
-
-    "Version": {
-      "@id": "lambda:Version",
-      "@context": {
-        "version": "lambda:version",
-        "functionArn": "lambda:functionArn",
-        "description": "schema:description",
-        "lastModified": {
-          "@id": "dcterms:modified",
-          "@type": "xsd:dateTime"
-        }
-      }
+    "arn": {
+      "@id": "lambda:arn",
+      "@type": "xsd:string"
+    },
+    "createdAt": {
+      "@id": "schema:dateCreated",
+      "@type": "xsd:dateTime"
+    },
+    "updatedAt": {
+      "@id": "schema:dateModified",
+      "@type": "xsd:dateTime"
     }
   }
 }
