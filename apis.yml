@@ -40,13 +40,13 @@ apis:
     url: https://docs.aws.amazon.com/lambda/latest/dg/lambda-auth-and-access-control.html
   - type: SDKs
     url: https://aws.amazon.com/tools/
-  - type: Status
+  - type: StatusPage
     url: https://status.aws.amazon.com/
   - type: Best Practices
     url: https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html
   - type: FAQ
     url: https://aws.amazon.com/lambda/faqs/
-  - type: Service Level Agreement
+  - type: ServiceLevelAgreement
     url: https://aws.amazon.com/lambda/sla/
   - type: User Guide
     url: https://docs.aws.amazon.com/lambda/latest/dg/
@@ -81,13 +81,13 @@ common:
   url: https://signin.aws.amazon.com/signup?request_type=register
 - type: Login
   url: https://aws.amazon.com/console/
-- type: Status
+- type: StatusPage
   url: https://health.aws.amazon.com/health/status
 - type: Knowledge Center
   url: https://repost.aws/knowledge-center
 - type: YouTube
   url: https://www.youtube.com/user/AmazonWebServices
-- type: Stack Overflow
+- type: StackOverflow
   url: https://stackoverflow.com/questions/tagged/aws-lambda
 - type: Contact
   url: https://aws.amazon.com/contact-us/
