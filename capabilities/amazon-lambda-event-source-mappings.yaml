@@ -1,0 +1,174 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Amazon Lambda API — Event Source Mappings
+  description: 'Amazon Lambda API — Event Source Mappings. 4 operations. Lead operation: Amazon Lambda Create Event Source
+    Mapping. Self-contained Naftiko capability covering one Amazon Lambda business surface.'
+  tags:
+  - Amazon Lambda
+  - Event Source Mappings
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    AMAZON_LAMBDA_API_KEY: AMAZON_LAMBDA_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: amazon-lambda-event-source-mappings
+    baseUri: https://lambda.us-east-1.amazonaws.com
+    description: Amazon Lambda API — Event Source Mappings business capability. Self-contained, no shared references.
+    resources:
+    - name: event-source-mappings
+      path: /event-source-mappings
+      operations:
+      - name: createeventsourcemapping
+        method: POST
+        description: Amazon Lambda Create Event Source Mapping
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: listeventsourcemappings
+        method: GET
+        description: Amazon Lambda List Event Source Mappings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: event-source-mappings-UUID
+      path: /event-source-mappings/{UUID}
+      operations:
+      - name: geteventsourcemapping
+        method: GET
+        description: Amazon Lambda Get Event Source Mapping
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UUID
+          in: path
+          type: string
+          description: The identifier of the event source mapping.
+          required: true
+      - name: deleteeventsourcemapping
+        method: DELETE
+        description: Amazon Lambda Delete Event Source Mapping
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UUID
+          in: path
+          type: string
+          description: The identifier of the event source mapping.
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.AMAZON_LAMBDA_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: amazon-lambda-event-source-mappings-rest
+    port: 8080
+    description: REST adapter for Amazon Lambda API — Event Source Mappings. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/event-source-mappings
+      name: event-source-mappings
+      description: REST surface for event-source-mappings.
+      operations:
+      - method: POST
+        name: createeventsourcemapping
+        description: Amazon Lambda Create Event Source Mapping
+        call: amazon-lambda-event-source-mappings.createeventsourcemapping
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: listeventsourcemappings
+        description: Amazon Lambda List Event Source Mappings
+        call: amazon-lambda-event-source-mappings.listeventsourcemappings
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/event-source-mappings/{uuid}
+      name: event-source-mappings-uuid
+      description: REST surface for event-source-mappings-UUID.
+      operations:
+      - method: GET
+        name: geteventsourcemapping
+        description: Amazon Lambda Get Event Source Mapping
+        call: amazon-lambda-event-source-mappings.geteventsourcemapping
+        with:
+          UUID: rest.UUID
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteeventsourcemapping
+        description: Amazon Lambda Delete Event Source Mapping
+        call: amazon-lambda-event-source-mappings.deleteeventsourcemapping
+        with:
+          UUID: rest.UUID
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: amazon-lambda-event-source-mappings-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Amazon Lambda API — Event Source Mappings. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: amazon-lambda-create-event-source
+      description: Amazon Lambda Create Event Source Mapping
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: amazon-lambda-event-source-mappings.createeventsourcemapping
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: amazon-lambda-list-event-source
+      description: Amazon Lambda List Event Source Mappings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: amazon-lambda-event-source-mappings.listeventsourcemappings
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: amazon-lambda-get-event-source
+      description: Amazon Lambda Get Event Source Mapping
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: amazon-lambda-event-source-mappings.geteventsourcemapping
+      with:
+        UUID: tools.UUID
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: amazon-lambda-delete-event-source
+      description: Amazon Lambda Delete Event Source Mapping
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: amazon-lambda-event-source-mappings.deleteeventsourcemapping
+      with:
+        UUID: tools.UUID
+      outputParameters:
+      - type: object
+        mapping: $.
