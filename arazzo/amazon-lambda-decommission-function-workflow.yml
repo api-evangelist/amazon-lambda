@@ -1,0 +1,70 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Decommission Function
+  summary: Confirm a function exists, read its configuration, then delete it.
+  description: >-
+    Safely removes a Lambda function. The workflow first reads the function to
+    confirm it exists and to capture its ARN and current State, branches to an
+    end state if the function is already gone, and otherwise deletes it. Every
+    step spells out its request inline so the flow can be read and executed
+    without opening the underlying OpenAPI description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: decommission-function
+  summary: Confirm a function, capture its configuration, and delete it.
+  description: >-
+    Reads a function to confirm it exists and capture its ARN, branches to an
+    end state when the function is missing, and otherwise deletes the function.
+  inputs:
+    type: object
+    required:
+    - FunctionName
+    properties:
+      FunctionName:
+        type: string
+        description: The name of the Lambda function to decommission.
+  steps:
+  - stepId: confirmFunction
+    description: >-
+      Read the function to confirm it exists and capture its ARN and State. A
+      404 is treated as already gone and ends the workflow.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      functionArn: $response.body#/FunctionArn
+      state: $response.body#/State
+    onSuccess:
+    - name: functionExists
+      type: goto
+      stepId: deleteFunction
+      criteria:
+      - condition: $statusCode == 200
+    onFailure:
+    - name: alreadyGone
+      type: end
+      criteria:
+      - condition: $statusCode == 404
+  - stepId: deleteFunction
+    description: >-
+      Delete the confirmed function.
+    operationId: DeleteFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      deletedFunctionArn: $steps.confirmFunction.outputs.functionArn
+  outputs:
+    deletedFunctionArn: $steps.deleteFunction.outputs.deletedFunctionArn
+    lastKnownState: $steps.confirmFunction.outputs.state

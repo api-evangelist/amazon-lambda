@@ -1,0 +1,147 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Deploy and Invoke Function
+  summary: Create a Lambda function, wait for it to become Active, then invoke it.
+  description: >-
+    The canonical Lambda deployment flow. A new function is created from a
+    deployment package, the workflow then polls GetFunction until the function
+    leaves the Pending state and reports Active, branching to a failure path if
+    the function ends up in the Failed state, and finally invokes the function to
+    confirm it is working. Every step spells out its request inline so the flow
+    can be read and executed without opening the underlying OpenAPI description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: deploy-and-invoke-function
+  summary: Create a function, poll until Active, and invoke it.
+  description: >-
+    Creates a Lambda function, polls GetFunction until the State reported by
+    Lambda is Active, branches on the terminal Failed state, and then invokes the
+    function with a sample payload.
+  inputs:
+    type: object
+    required:
+    - FunctionName
+    - Runtime
+    - Role
+    - Handler
+    properties:
+      FunctionName:
+        type: string
+        description: The name of the Lambda function to create (e.g. my-function).
+      Runtime:
+        type: string
+        description: The function's runtime identifier (e.g. python3.12).
+      Role:
+        type: string
+        description: The execution role ARN the function assumes when invoked.
+      Handler:
+        type: string
+        description: The handler Lambda calls to begin execution.
+      Description:
+        type: string
+        description: An optional description for the function.
+      Timeout:
+        type: integer
+        description: The number of seconds Lambda allows the function to run.
+      MemorySize:
+        type: integer
+        description: The amount of memory (in MB) available to the function.
+      invocationPayload:
+        type: object
+        description: The JSON event payload to send to the function on invocation.
+  steps:
+  - stepId: createFunction
+    description: >-
+      Create the Lambda function from the supplied runtime, role, and handler.
+      The function is typically returned in the Pending state.
+    operationId: CreateFunction
+    requestBody:
+      contentType: application/json
+      payload:
+        FunctionName: $inputs.FunctionName
+        Runtime: $inputs.Runtime
+        Role: $inputs.Role
+        Handler: $inputs.Handler
+        Description: $inputs.Description
+        Timeout: $inputs.Timeout
+        MemorySize: $inputs.MemorySize
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      functionArn: $response.body#/FunctionArn
+      initialState: $response.body#/State
+  - stepId: waitForActive
+    description: >-
+      Poll the function until Lambda reports it has finished provisioning. A
+      State of Active continues to invocation; a State of Failed branches to the
+      failure handler.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      state: $response.body#/State
+    onSuccess:
+    - name: functionActive
+      type: goto
+      stepId: invokeFunction
+      criteria:
+      - context: $response.body
+        condition: $.State == "Active"
+        type: jsonpath
+    - name: functionFailed
+      type: goto
+      stepId: reportFailure
+      criteria:
+      - context: $response.body
+        condition: $.State == "Failed"
+        type: jsonpath
+    onFailure:
+    - name: retryGet
+      type: retry
+      retryAfter: 5
+      retryLimit: 20
+      stepId: waitForActive
+  - stepId: invokeFunction
+    description: >-
+      Invoke the now-Active function with the supplied event payload and capture
+      the response.
+    operationId: InvokeFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    requestBody:
+      contentType: application/json
+      payload: $inputs.invocationPayload
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      invocationResult: $response.body
+    onSuccess:
+    - name: done
+      type: end
+  - stepId: reportFailure
+    description: >-
+      Re-read the function configuration when it has entered the Failed state so
+      the caller can surface the terminal state.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      failedState: $response.body#/State
+  outputs:
+    functionArn: $steps.createFunction.outputs.functionArn
+    invocationResult: $steps.invokeFunction.outputs.invocationResult
+    failedState: $steps.reportFailure.outputs.failedState

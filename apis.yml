@@ -62,6 +62,33 @@ apis:
   - type: NaftikoCapability
     url: capabilities/amazon-lambda-functions.yaml
 common:
+- type: ArazzoWorkflows
+  url: arazzo/
+  workflows:
+  - url: arazzo/amazon-lambda-decommission-function-workflow.yml
+    name: Amazon Lambda Decommission Function
+    summary: Confirm a function exists, read its configuration, then delete it.
+  - url: arazzo/amazon-lambda-deploy-and-invoke-function-workflow.yml
+    name: Amazon Lambda Deploy and Invoke Function
+    summary: Create a Lambda function, wait for it to become Active, then invoke it.
+  - url: arazzo/amazon-lambda-deploy-with-event-source-workflow.yml
+    name: Amazon Lambda Deploy Function With Event Source
+    summary: Create a function, wait until Active, attach an event source mapping, and wait until Enabled.
+  - url: arazzo/amazon-lambda-provision-event-source-mapping-workflow.yml
+    name: Amazon Lambda Provision Event Source Mapping
+    summary: Create an event source mapping and poll it until it reaches the Enabled state.
+  - url: arazzo/amazon-lambda-reconfigure-function-workflow.yml
+    name: Amazon Lambda Reconfigure Function
+    summary: Change a function's runtime settings, wait for Active, then invoke to verify.
+  - url: arazzo/amazon-lambda-redeploy-discovered-function-workflow.yml
+    name: Amazon Lambda Redeploy Discovered Function
+    summary: List functions, select one by name, push new code, and wait until Active.
+  - url: arazzo/amazon-lambda-teardown-event-source-mapping-workflow.yml
+    name: Amazon Lambda Teardown Event Source Mapping
+    summary: Locate an event source mapping in the list, confirm its details, then delete it.
+  - url: arazzo/amazon-lambda-update-code-and-verify-workflow.yml
+    name: Amazon Lambda Update Code and Verify
+    summary: Push new function code, wait for the update to settle, then invoke to verify.
 - type: Portal
   url: https://aws.amazon.com/
 - type: Portal

@@ -1,0 +1,160 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Deploy Function With Event Source
+  summary: Create a function, wait until Active, attach an event source mapping, and wait until Enabled.
+  description: >-
+    A full event-driven deployment. The workflow creates a Lambda function,
+    polls GetFunction until the function is Active, then creates an event source
+    mapping that wires an event source to the new function and polls
+    GetEventSourceMapping until that mapping reports Enabled. Every step spells
+    out its request inline so the flow can be read and executed without opening
+    the underlying OpenAPI description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: deploy-with-event-source
+  summary: Create a function, wait for Active, then attach and enable an event source mapping.
+  description: >-
+    Creates a function and polls GetFunction until Active, then creates an event
+    source mapping against that function and polls GetEventSourceMapping until
+    the mapping is Enabled.
+  inputs:
+    type: object
+    required:
+    - FunctionName
+    - Runtime
+    - Role
+    - Handler
+    - EventSourceArn
+    properties:
+      FunctionName:
+        type: string
+        description: The name of the Lambda function to create.
+      Runtime:
+        type: string
+        description: The function's runtime identifier (e.g. nodejs20.x).
+      Role:
+        type: string
+        description: The execution role ARN the function assumes.
+      Handler:
+        type: string
+        description: The handler Lambda calls to begin execution.
+      EventSourceArn:
+        type: string
+        description: The ARN of the event source to wire to the function.
+      BatchSize:
+        type: integer
+        description: The maximum number of records in each batch.
+  steps:
+  - stepId: createFunction
+    description: >-
+      Create the Lambda function. It is typically returned in the Pending state.
+    operationId: CreateFunction
+    requestBody:
+      contentType: application/json
+      payload:
+        FunctionName: $inputs.FunctionName
+        Runtime: $inputs.Runtime
+        Role: $inputs.Role
+        Handler: $inputs.Handler
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      functionArn: $response.body#/FunctionArn
+  - stepId: waitForActive
+    description: >-
+      Poll the function until Lambda reports it Active. A Failed state branches
+      to the failure handler.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      state: $response.body#/State
+    onSuccess:
+    - name: functionActive
+      type: goto
+      stepId: createMapping
+      criteria:
+      - context: $response.body
+        condition: $.State == "Active"
+        type: jsonpath
+    - name: functionFailed
+      type: goto
+      stepId: reportFailure
+      criteria:
+      - context: $response.body
+        condition: $.State == "Failed"
+        type: jsonpath
+    onFailure:
+    - name: retryGet
+      type: retry
+      retryAfter: 5
+      retryLimit: 20
+      stepId: waitForActive
+  - stepId: createMapping
+    description: >-
+      Create an event source mapping that wires the supplied event source to the
+      now-Active function.
+    operationId: CreateEventSourceMapping
+    requestBody:
+      contentType: application/json
+      payload:
+        EventSourceArn: $inputs.EventSourceArn
+        FunctionName: $inputs.FunctionName
+        BatchSize: $inputs.BatchSize
+        Enabled: true
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      uuid: $response.body#/UUID
+  - stepId: waitForEnabled
+    description: >-
+      Poll the mapping by UUID until it finishes provisioning and reports the
+      Enabled state.
+    operationId: GetEventSourceMapping
+    parameters:
+    - name: UUID
+      in: path
+      value: $steps.createMapping.outputs.uuid
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      mappingState: $response.body#/State
+    onSuccess:
+    - name: mappingEnabled
+      type: end
+      criteria:
+      - context: $response.body
+        condition: $.State == "Enabled"
+        type: jsonpath
+    onFailure:
+    - name: retryGet
+      type: retry
+      retryAfter: 5
+      retryLimit: 20
+      stepId: waitForEnabled
+  - stepId: reportFailure
+    description: >-
+      Re-read the function when it has entered the Failed state so the caller can
+      surface the terminal state before any mapping is created.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      failedState: $response.body#/State
+  outputs:
+    functionArn: $steps.createFunction.outputs.functionArn
+    uuid: $steps.createMapping.outputs.uuid
+    mappingState: $steps.waitForEnabled.outputs.mappingState
+    failedState: $steps.reportFailure.outputs.failedState

@@ -1,0 +1,135 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Update Code and Verify
+  summary: Push new function code, wait for the update to settle, then invoke to verify.
+  description: >-
+    A safe code-deployment loop for an existing Lambda function. The workflow
+    pushes a new deployment package, polls GetFunction until the function returns
+    to the Active state after the update, and then invokes the function with a
+    smoke-test payload to confirm the new code is healthy. Every step spells out
+    its request inline so the flow can be read and executed without opening the
+    underlying OpenAPI description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: update-code-and-verify
+  summary: Update a function's code, wait for Active, and smoke-test it.
+  description: >-
+    Updates the deployment package of an existing function, polls GetFunction
+    until the State returns to Active, and invokes the function to verify the
+    new code responds.
+  inputs:
+    type: object
+    required:
+    - FunctionName
+    properties:
+      FunctionName:
+        type: string
+        description: The name of the Lambda function whose code is being updated.
+      ZipFile:
+        type: string
+        description: Base64-encoded contents of the deployment package zip.
+      S3Bucket:
+        type: string
+        description: An S3 bucket holding the deployment package (alternative to ZipFile).
+      S3Key:
+        type: string
+        description: The S3 key of the deployment package object.
+      invocationPayload:
+        type: object
+        description: The JSON event payload used to smoke-test the updated function.
+  steps:
+  - stepId: updateCode
+    description: >-
+      Push the new deployment package to the function. Lambda returns the
+      version-specific configuration with the State that resulted from the
+      update.
+    operationId: UpdateFunctionCode
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    requestBody:
+      contentType: application/json
+      payload:
+        ZipFile: $inputs.ZipFile
+        S3Bucket: $inputs.S3Bucket
+        S3Key: $inputs.S3Key
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      functionArn: $response.body#/FunctionArn
+      lastModified: $response.body#/LastModified
+  - stepId: waitForActive
+    description: >-
+      Poll the function until the update finishes and the State returns to
+      Active. A Failed state branches to the failure handler.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      state: $response.body#/State
+    onSuccess:
+    - name: functionActive
+      type: goto
+      stepId: verifyInvoke
+      criteria:
+      - context: $response.body
+        condition: $.State == "Active"
+        type: jsonpath
+    - name: functionFailed
+      type: goto
+      stepId: reportFailure
+      criteria:
+      - context: $response.body
+        condition: $.State == "Failed"
+        type: jsonpath
+    onFailure:
+    - name: retryGet
+      type: retry
+      retryAfter: 5
+      retryLimit: 20
+      stepId: waitForActive
+  - stepId: verifyInvoke
+    description: >-
+      Invoke the function with a smoke-test payload to confirm the new code
+      executes successfully.
+    operationId: InvokeFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    requestBody:
+      contentType: application/json
+      payload: $inputs.invocationPayload
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      invocationResult: $response.body
+    onSuccess:
+    - name: done
+      type: end
+  - stepId: reportFailure
+    description: >-
+      Re-read the configuration when the update left the function in the Failed
+      state so the caller can surface and roll back.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      failedState: $response.body#/State
+  outputs:
+    functionArn: $steps.updateCode.outputs.functionArn
+    invocationResult: $steps.verifyInvoke.outputs.invocationResult
+    failedState: $steps.reportFailure.outputs.failedState

@@ -1,0 +1,111 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Redeploy Discovered Function
+  summary: List functions, select one by name, push new code, and wait until Active.
+  description: >-
+    A discovery-driven redeploy. The workflow lists the Lambda functions in the
+    account, selects the function whose name matches the supplied target, pushes
+    a new deployment package, and polls GetFunction until the function returns to
+    the Active state after the update. Every step spells out its request inline
+    so the flow can be read and executed without opening the underlying OpenAPI
+    description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: redeploy-discovered-function
+  summary: Discover a function from the list, update its code, and wait for Active.
+  description: >-
+    Lists functions, confirms the target function exists, updates its code, and
+    polls GetFunction until the State returns to Active.
+  inputs:
+    type: object
+    required:
+    - FunctionName
+    properties:
+      FunctionName:
+        type: string
+        description: The name of the Lambda function to redeploy.
+      ZipFile:
+        type: string
+        description: Base64-encoded contents of the new deployment package zip.
+      S3Bucket:
+        type: string
+        description: An S3 bucket holding the new deployment package.
+      S3Key:
+        type: string
+        description: The S3 key of the new deployment package object.
+  steps:
+  - stepId: listFunctions
+    description: >-
+      List the functions in the account so the target can be confirmed before
+      any code is pushed.
+    operationId: ListFunctions
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      firstFunctionName: $response.body#/Functions/0/FunctionName
+    onSuccess:
+    - name: hasFunctions
+      type: goto
+      stepId: updateCode
+      criteria:
+      - context: $response.body
+        condition: $.Functions.length > 0
+        type: jsonpath
+    - name: noFunctions
+      type: end
+      criteria:
+      - context: $response.body
+        condition: $.Functions.length == 0
+        type: jsonpath
+  - stepId: updateCode
+    description: >-
+      Push the new deployment package to the target function.
+    operationId: UpdateFunctionCode
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    requestBody:
+      contentType: application/json
+      payload:
+        ZipFile: $inputs.ZipFile
+        S3Bucket: $inputs.S3Bucket
+        S3Key: $inputs.S3Key
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      functionArn: $response.body#/FunctionArn
+      lastModified: $response.body#/LastModified
+  - stepId: waitForActive
+    description: >-
+      Poll the function until the update finishes and the State returns to
+      Active.
+    operationId: GetFunction
+    parameters:
+    - name: FunctionName
+      in: path
+      value: $inputs.FunctionName
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      state: $response.body#/State
+    onSuccess:
+    - name: functionActive
+      type: end
+      criteria:
+      - context: $response.body
+        condition: $.State == "Active"
+        type: jsonpath
+    onFailure:
+    - name: retryGet
+      type: retry
+      retryAfter: 5
+      retryLimit: 20
+      stepId: waitForActive
+  outputs:
+    functionArn: $steps.updateCode.outputs.functionArn
+    state: $steps.waitForActive.outputs.state

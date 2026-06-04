@@ -1,0 +1,90 @@
+arazzo: 1.0.1
+info:
+  title: Amazon Lambda Teardown Event Source Mapping
+  summary: Locate an event source mapping in the list, confirm its details, then delete it.
+  description: >-
+    Cleanly removes an event source mapping. The workflow lists the existing
+    mappings, selects the first one, reads its full details to confirm the target
+    before any destructive action, and then deletes it. Every step spells out its
+    request inline so the flow can be read and executed without opening the
+    underlying OpenAPI description.
+  version: 1.0.0
+sourceDescriptions:
+- name: amazonLambdaApi
+  url: ../openapi/amazon-lambda-openapi.yml
+  type: openapi
+workflows:
+- workflowId: teardown-event-source-mapping
+  summary: List, confirm, and delete an event source mapping.
+  description: >-
+    Lists event source mappings, takes the first returned mapping, reads its
+    details by UUID, and deletes it.
+  inputs:
+    type: object
+    properties:
+      FunctionName:
+        type: string
+        description: Optional function name filter when listing mappings.
+      EventSourceArn:
+        type: string
+        description: Optional event source ARN filter when listing mappings.
+  steps:
+  - stepId: listMappings
+    description: >-
+      List the event source mappings, optionally filtered by function name or
+      event source ARN, and take the first match.
+    operationId: ListEventSourceMappings
+    parameters:
+    - name: FunctionName
+      in: query
+      value: $inputs.FunctionName
+    - name: EventSourceArn
+      in: query
+      value: $inputs.EventSourceArn
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      targetUuid: $response.body#/EventSourceMappings/0/UUID
+    onSuccess:
+    - name: foundMapping
+      type: goto
+      stepId: confirmMapping
+      criteria:
+      - context: $response.body
+        condition: $.EventSourceMappings.length > 0
+        type: jsonpath
+    - name: noneFound
+      type: end
+      criteria:
+      - context: $response.body
+        condition: $.EventSourceMappings.length == 0
+        type: jsonpath
+  - stepId: confirmMapping
+    description: >-
+      Read the full details of the selected mapping by UUID to confirm the
+      target before deleting it.
+    operationId: GetEventSourceMapping
+    parameters:
+    - name: UUID
+      in: path
+      value: $steps.listMappings.outputs.targetUuid
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      state: $response.body#/State
+      functionArn: $response.body#/FunctionArn
+  - stepId: deleteMapping
+    description: >-
+      Delete the confirmed event source mapping by UUID.
+    operationId: DeleteEventSourceMapping
+    parameters:
+    - name: UUID
+      in: path
+      value: $steps.listMappings.outputs.targetUuid
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      deletedState: $response.body#/State
+  outputs:
+    targetUuid: $steps.listMappings.outputs.targetUuid
+    deletedState: $steps.deleteMapping.outputs.deletedState
