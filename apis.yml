@@ -1,16 +1,18 @@
 name: Amazon Lambda
-description: AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers, automatically
-  scaling and executing your code in response to events from over 200 AWS services and SaaS applications while you pay only
-  for the compute time you consume.
+description: >-
+  AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers,
+  automatically scaling and executing your code in response to events from over 200 AWS services and SaaS applications
+  while you pay only for the compute time you consume.
 image: https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png
 url: https://aws.amazon.com/lambda/
 created: '2024-01-15'
 modified: '2026-05-19'
 apis:
 - name: Amazon Lambda API
-  description: Core API for managing AWS Lambda functions, event source mappings, layers, aliases, versions, and permissions.
-    Enables creating and invoking serverless functions, configuring triggers from AWS services, and managing function deployment
-    packages and runtime configurations.
+  description: >-
+    Core API for managing AWS Lambda functions, event source mappings, layers, aliases, versions, and permissions.
+    Enables creating and invoking serverless functions, configuring triggers from AWS services, and managing function
+    deployment packages and runtime configurations.
   image: https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png
   humanURL: https://aws.amazon.com/lambda/
   baseURL: https://lambda.amazonaws.com
@@ -57,11 +59,11 @@ apis:
     url: https://docs.aws.amazon.com/lambda/latest/dg/lambda-security.html
   - type: JSONSchema
     url: json-schema/amazon-lambda-event-source-mapping-schema.json
-  - type: NaftikoCapability
-    url: capabilities/amazon-lambda-event-source-mappings.yaml
-  - type: NaftikoCapability
-    url: capabilities/amazon-lambda-functions.yaml
+  - url: graphql/amazon-lambda-graphql.md
+    type: GraphQL
 common:
+- type: PostmanWorkspace
+  url: https://www.postman.com/kinlaneapi/amazon-lambda/overview
 - type: ArazzoWorkflows
   url: arazzo/
   workflows:
