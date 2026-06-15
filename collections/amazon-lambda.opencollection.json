@@ -1,0 +1,211 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Amazon Lambda API",
+    "version": "2024-01-01"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "Authorization",
+      "value": "{{Authorization}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Functions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Amazon Lambda List Functions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions"
+          },
+          "docs": "Returns a list of Lambda functions, with the version-specific configuration of each."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Create Function",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions"
+          },
+          "docs": "Creates a Lambda function."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Get Function",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions/:FunctionName",
+            "params": [
+              {
+                "name": "FunctionName",
+                "value": "",
+                "type": "path",
+                "description": "The name of the Lambda function."
+              }
+            ]
+          },
+          "docs": "Returns information about the function or function version."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Delete Function",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions/:FunctionName",
+            "params": [
+              {
+                "name": "FunctionName",
+                "value": "",
+                "type": "path",
+                "description": "The name of the Lambda function."
+              }
+            ]
+          },
+          "docs": "Deletes a Lambda function."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Update Function Code",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions/:FunctionName/code",
+            "params": [
+              {
+                "name": "FunctionName",
+                "value": "",
+                "type": "path",
+                "description": "The name of the Lambda function."
+              }
+            ]
+          },
+          "docs": "Updates a Lambda function's code."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Update Function Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions/:FunctionName/configuration",
+            "params": [
+              {
+                "name": "FunctionName",
+                "value": "",
+                "type": "path",
+                "description": "The name of the Lambda function."
+              }
+            ]
+          },
+          "docs": "Modify the version-specific settings of a Lambda function."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Invoke Function",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://lambda.us-east-1.amazonaws.com/functions/:FunctionName/invocations",
+            "params": [
+              {
+                "name": "FunctionName",
+                "value": "",
+                "type": "path",
+                "description": "The name of the Lambda function."
+              }
+            ]
+          },
+          "docs": "Invokes a Lambda function."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Event Source Mappings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Amazon Lambda List Event Source Mappings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://lambda.us-east-1.amazonaws.com/event-source-mappings"
+          },
+          "docs": "Lists event source mappings."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Create Event Source Mapping",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://lambda.us-east-1.amazonaws.com/event-source-mappings"
+          },
+          "docs": "Creates a mapping between an event source and an AWS Lambda function."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Get Event Source Mapping",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://lambda.us-east-1.amazonaws.com/event-source-mappings/:UUID",
+            "params": [
+              {
+                "name": "UUID",
+                "value": "",
+                "type": "path",
+                "description": "The identifier of the event source mapping."
+              }
+            ]
+          },
+          "docs": "Returns details about an event source mapping."
+        },
+        {
+          "info": {
+            "name": "Amazon Lambda Delete Event Source Mapping",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://lambda.us-east-1.amazonaws.com/event-source-mappings/:UUID",
+            "params": [
+              {
+                "name": "UUID",
+                "value": "",
+                "type": "path",
+                "description": "The identifier of the event source mapping."
+              }
+            ]
+          },
+          "docs": "Deletes an event source mapping."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
