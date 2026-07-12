@@ -62,6 +62,14 @@ apis:
   - url: graphql/amazon-lambda-graphql.md
     type: GraphQL
 common:
+- type: TrustCenter
+  url: security/amazon-lambda-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/amazon-lambda-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/amazon-lambda-domain-security.yml
+- type: Authentication
+  url: authentication/amazon-lambda-authentication.yml
 - type: PostmanWorkspace
   url: https://www.postman.com/kinlaneapi/amazon-lambda/overview
 - type: Arazzo
