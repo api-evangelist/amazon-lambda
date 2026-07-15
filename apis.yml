@@ -62,6 +62,8 @@ apis:
   - url: graphql/amazon-lambda-graphql.md
     type: GraphQL
 common:
+- type: AgenticAccess
+  url: agentic-access/amazon-lambda-agentic-access.yml
 - type: TrustCenter
   url: security/amazon-lambda-trust-center.yml
 - type: VulnerabilityDisclosure
