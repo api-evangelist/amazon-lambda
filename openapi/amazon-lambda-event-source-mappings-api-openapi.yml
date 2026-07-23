@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: Amazon Lambda Event Source Mappings API
+  description: The Amazon Lambda API provides programmatic access to manage Lambda resources.
+  version: '2024-01-01'
+  contact:
+    name: AWS Support
+    url: https://aws.amazon.com/premiumsupport/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  x-logo:
+    url: https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png
+servers:
+- url: https://lambda.us-east-1.amazonaws.com
+  description: Amazon Lambda endpoint
+security:
+- sigv4: []
+tags:
+- name: Event Source Mappings
+  description: Lambda event source mapping management
+paths:
+  /event-source-mappings:
+    post:
+      operationId: CreateEventSourceMapping
+      summary: Amazon Lambda Create Event Source Mapping
+      description: Creates a mapping between an event source and an AWS Lambda function.
+      tags:
+      - Event Source Mappings
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+    get:
+      operationId: ListEventSourceMappings
+      summary: Amazon Lambda List Event Source Mappings
+      description: Lists event source mappings.
+      tags:
+      - Event Source Mappings
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+  /event-source-mappings/{UUID}:
+    get:
+      operationId: GetEventSourceMapping
+      summary: Amazon Lambda Get Event Source Mapping
+      description: Returns details about an event source mapping.
+      tags:
+      - Event Source Mappings
+      parameters:
+      - name: UUID
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The identifier of the event source mapping.
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+    delete:
+      operationId: DeleteEventSourceMapping
+      summary: Amazon Lambda Delete Event Source Mapping
+      description: Deletes an event source mapping.
+      tags:
+      - Event Source Mappings
+      parameters:
+      - name: UUID
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The identifier of the event source mapping.
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '403':
+          description: Access denied
+        '500':
+          description: Internal server error
+      x-microcks-operation:
+        delay: 0
+        dispatcher: FALLBACK
+components:
+  securitySchemes:
+    sigv4:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: AWS Signature Version 4 authentication
