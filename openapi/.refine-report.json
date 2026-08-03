@@ -1,0 +1,16 @@
+{
+  "provider": "amazon-lambda",
+  "sources": [
+    "amazon-lambda-event-source-mappings-api-openapi.yml",
+    "amazon-lambda-functions-api-openapi.yml"
+  ],
+  "outputs": [
+    "amazon-lambda-event-source-mappings-api-openapi.yml",
+    "amazon-lambda-functions-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
