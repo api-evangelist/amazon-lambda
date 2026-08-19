@@ -3,6 +3,7 @@ description: >-
   AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers,
   automatically scaling and executing your code in response to events from over 200 AWS services and SaaS applications
   while you pay only for the compute time you consume.
+specificationVersion: '0.23'
 accessModel:
   pricing: freemium
   onboarding: self-serve
