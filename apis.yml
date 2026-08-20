@@ -235,6 +235,13 @@ tags:
 - AWS
 - Compute
 - Event-Driven
+- Function-as-a-Service
+- Functions
+- Serverless
+tags_raw:
+- AWS
+- Compute
+- Event-Driven
 - FaaS
 - Functions
 - Serverless
