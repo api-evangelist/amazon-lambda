@@ -11,8 +11,11 @@ info:
     the underlying OpenAPI description.
   version: 1.0.0
 sourceDescriptions:
-- name: amazonLambdaApi
-  url: ../openapi/amazon-lambda-openapi.yml
+- name: eventSourceMappingsApi
+  url: ../openapi/amazon-lambda-event-source-mappings-api-openapi.yml
+  type: openapi
+- name: functionsApi
+  url: ../openapi/amazon-lambda-functions-api-openapi.yml
   type: openapi
 workflows:
 - workflowId: deploy-with-event-source
