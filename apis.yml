@@ -257,3 +257,5 @@ tags_raw:
 - FaaS
 - Functions
 - Serverless
+x-parent: aws
+x-relationship: product
