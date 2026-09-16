@@ -1,8 +1,7 @@
 name: Amazon Lambda
-description: >-
-  AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers,
-  automatically scaling and executing your code in response to events from over 200 AWS services and SaaS applications
-  while you pay only for the compute time you consume.
+description: AWS Lambda is a serverless compute service that lets you run code without provisioning or
+  managing servers, automatically scaling and executing your code in response to events from over 200
+  AWS services and SaaS applications while you pay only for the compute time you consume.
 deliveryModel:
   model: saas
   open_source: false
@@ -33,7 +32,7 @@ accessModel:
 image: https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png
 url: https://aws.amazon.com/lambda/
 created: '2024-01-15'
-modified: '2026-05-19'
+modified: '2026-09-16'
 apis:
 - aid: amazon-lambda:amazon-lambda-event-source-mappings-api
   name: Amazon Lambda Event Source Mappings API
@@ -124,6 +123,8 @@ apis:
   - type: GraphQL
     url: graphql/amazon-lambda-graphql.md
 common:
+- type: Website
+  url: https://amazon.com
 - type: AgenticAccess
   url: agentic-access/amazon-lambda-agentic-access.yml
 - type: TrustCenter
