@@ -76,8 +76,6 @@ apis:
     url: https://docs.aws.amazon.com/lambda/latest/dg/lambda-security.html
   - type: JSONSchema
     url: json-schema/amazon-lambda-event-source-mapping-schema.json
-  - type: GraphQL
-    url: graphql/amazon-lambda-graphql.md
 - aid: amazon-lambda:amazon-lambda-functions-api
   name: Amazon Lambda Functions API
   description: Lambda function management
@@ -120,11 +118,9 @@ apis:
     url: https://docs.aws.amazon.com/lambda/latest/dg/lambda-security.html
   - type: JSONSchema
     url: json-schema/amazon-lambda-event-source-mapping-schema.json
-  - type: GraphQL
-    url: graphql/amazon-lambda-graphql.md
 common:
 - type: Website
-  url: https://amazon.com
+  url: https://aws.amazon.com/lambda/
 - type: AgenticAccess
   url: agentic-access/amazon-lambda-agentic-access.yml
 - type: TrustCenter
@@ -259,5 +255,5 @@ tags_raw:
 - FaaS
 - Functions
 - Serverless
-x-parent: aws
+x-parent: amazon-web-services
 x-relationship: product
